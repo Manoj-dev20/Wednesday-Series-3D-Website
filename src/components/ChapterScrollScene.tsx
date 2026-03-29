@@ -194,15 +194,11 @@ export default function ChapterScrollScene({
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{
-                      enter: {
+                      
                         duration: zone.enterDuration || 0.9,
-                        ease: 'easeOut',
-                        delay: zone.delay || 0,
-                      },
-                      exit: { duration: 0.5 },
-                      duration: zone.enterDuration || 0.9,
-                      ease: 'easeOut',
-                      delay: zone.delay || 0,
+    ease: 'easeOut',
+    delay: zone.delay || 0,
+                     
                     }}
                     className="absolute"
                     style={{
