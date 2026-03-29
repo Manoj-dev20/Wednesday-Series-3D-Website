@@ -4,13 +4,15 @@
 'use client';
 
 import { useRef, useEffect, useCallback, useState } from 'react';
-import type { GSAP } from 'gsap';
 import type { ScrollTrigger as ST } from 'gsap/ScrollTrigger';
 
-// ✅ FIX: Proper window typing
+// ✅ FIX: Proper GSAP type (NO GSAP import error)
+type GSAPType = typeof import('gsap').gsap;
+
+// ✅ FIX: Window typing
 declare global {
   interface Window {
-    __gsapRef?: GSAP;
+    __gsapRef?: GSAPType;
   }
 }
 
@@ -81,9 +83,7 @@ const SHOTS: ShotConfig[] = [
   { label: 'CAM · 005 — PULL BACK', wrap: { x: 0, y: 35, scale: 0.86 }, halo: { scale: 1.6, opacity: 0.9 }, texts: ['role', 'name', 'surname', 'quote'] },
 ];
 
-const ALL_TEXT_KEYS = ['index', 'role', 'name', 'surname', 'quote', 'stat1', 'stat2', 'detail', 'abilities'];
-const SCROLL_PER_SHOT = 300;
-const TOTAL_SCROLL = CHARACTERS.length * SHOTS.length * SCROLL_PER_SHOT;
+const TOTAL_SCROLL = CHARACTERS.length * SHOTS.length * 300;
 
 // ============================================================
 // COMPONENT
@@ -95,40 +95,39 @@ export default function CharacterIntro() {
   const haloRef = useRef<HTMLDivElement>(null);
   const halo2Ref = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
-  const progressRef = useRef<HTMLDivElement>(null);
-  const camLabelRef = useRef<HTMLDivElement>(null);
-
-  const textRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const dotRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const currentCharIdx = useRef(0);
   const currentShotIdx = useRef(0);
 
   const [isReady, setIsReady] = useState(false);
 
-  const setTextRef = useCallback((key: string) => (el: HTMLDivElement | null) => {
-    textRefs.current[key] = el;
-  }, []);
-
-  const setDotRef = useCallback((i: number) => (el: HTMLDivElement | null) => {
-    dotRefs.current[i] = el;
-  }, []);
-
-  const showShot = useCallback((charIdx: number, shotIdx: number, direction: number = 1, instant = false) => {
+  const showShot = useCallback((charIdx: number, shotIdx: number) => {
     const gsap = window.__gsapRef;
     if (!gsap || !charWrapRef.current) return;
 
     const char = CHARACTERS[charIdx];
     const shot = SHOTS[shotIdx];
-    const charChanged = charIdx !== currentCharIdx.current;
-    const dur = instant ? 0 : 1.1;
 
-    gsap.to(charWrapRef.current, { x: shot.wrap.x, y: shot.wrap.y, scale: shot.wrap.scale, duration: dur });
+    gsap.to(charWrapRef.current, {
+      x: shot.wrap.x,
+      y: shot.wrap.y,
+      scale: shot.wrap.scale,
+      duration: 1,
+    });
 
-    gsap.to(haloRef.current, { scale: shot.halo.scale, opacity: shot.halo.opacity, duration: dur });
-    gsap.to(halo2Ref.current, { scale: shot.halo.scale * 1.12, opacity: shot.halo.opacity * 0.35, duration: dur });
+    gsap.to(haloRef.current, {
+      scale: shot.halo.scale,
+      opacity: shot.halo.opacity,
+      duration: 1,
+    });
 
-    if (charChanged && imgRef.current) {
+    gsap.to(halo2Ref.current, {
+      scale: shot.halo.scale * 1.1,
+      opacity: shot.halo.opacity * 0.3,
+      duration: 1,
+    });
+
+    if (imgRef.current) {
       imgRef.current.src = char.image;
     }
 
@@ -137,21 +136,18 @@ export default function CharacterIntro() {
   }, []);
 
   useEffect(() => {
-    let gsap: GSAP;
-    let ScrollTrigger: typeof ST;
-
     const init = async () => {
       const gsapMod = await import('gsap');
       const stMod = await import('gsap/ScrollTrigger');
 
-      gsap = gsapMod.gsap;
-      ScrollTrigger = stMod.ScrollTrigger;
+      const gsap = gsapMod.gsap;
+      const ScrollTrigger = stMod.ScrollTrigger;
 
       gsap.registerPlugin(ScrollTrigger);
 
       window.__gsapRef = gsap;
 
-      showShot(0, 0, 1, true);
+      showShot(0, 0);
       setIsReady(true);
 
       ScrollTrigger.create({
@@ -176,9 +172,16 @@ export default function CharacterIntro() {
 
   return (
     <div ref={sectionRef} style={{ height: `calc(100vh + ${TOTAL_SCROLL}px)` }}>
-      <div className="sticky top-0 h-screen bg-black">
-        <div ref={charWrapRef} className="flex items-center justify-center h-full">
-          <img ref={imgRef} src={CHARACTERS[0].image} style={{ height: '100%' }} />
+      <div className="sticky top-0 h-screen bg-black flex items-center justify-center">
+        <div ref={charWrapRef} className="relative">
+          <div ref={halo2Ref} className="absolute w-[480px] h-[480px] border border-white/10 rounded-full" />
+          <div ref={haloRef} className="absolute w-[360px] h-[360px] border border-white/20 rounded-full" />
+          <img
+            ref={imgRef}
+            src={CHARACTERS[0].image}
+            alt="character"
+            className="relative z-10 h-[80vh] object-contain"
+          />
         </div>
       </div>
     </div>
