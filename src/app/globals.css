@@ -2,26 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #000000;
+  overflow-x: hidden;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+body::-webkit-scrollbar {
+  display: none;
+}
+
+::selection {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+/* Gothic cursor - hide default on desktop */
+@media (pointer: fine) {
+  * {
+    cursor: none !important;
   }
+}
+
+/* Canvas reset */
+canvas {
+  display: block;
 }

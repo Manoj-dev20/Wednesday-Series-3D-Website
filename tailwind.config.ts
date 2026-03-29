@@ -9,8 +9,26 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        'wednesday-dark': '#080A12',
+        'sword-dark': '#000000',
+        'thing-dark': '#060C14',
+        'cta-start': '#0A0000',
+        'cta-end': '#1A0800',
+        'netflix-red': '#E50914',
+      },
+      animation: {
+        'pulse-slow': 'pulse-slow 2s ease-in-out infinite',
+        'pulse-cue': 'pulse-cue 2s ease-in-out infinite',
+      },
+      keyframes: {
+        'pulse-slow': {
+          '0%, 100%': { opacity: '0.4' },
+          '50%': { opacity: '1' },
+        },
+        'pulse-cue': {
+          '0%, 100%': { opacity: '0.3' },
+          '50%': { opacity: '0.8' },
+        },
       },
     },
   },
